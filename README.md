@@ -37,9 +37,9 @@ npm run preview
 4. Lighthouse en la home y en una herramienta (LCP, CLS, JS inicial).
 5. `view-source` de una página: title, canonical, hreflang, JSON-LD.
 
-## Despliegue (Cloudflare Pages)
+## Despliegue (Cloudflare)
 
-Build `npm run build`, salida `dist`, variables de `.env.example`. `public/_headers` aplica cabeceras básicas.
+Conexión con GitHub; build `npm run build`, deploy `npx wrangler deploy` (usa `wrangler.jsonc`, publica `dist/`). Variables de build: las de `.env.example` (`SITE_URL`, `PUBLIC_*`). `.node-version` fija Node 22. `npm run build:check` ejecuta además `astro check` (tipos). `public/_headers` aplica cabeceras básicas.
 Tras desplegar: enviar `/sitemap-index.xml` en Google Search Console.
 
 ## Donaciones

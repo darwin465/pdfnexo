@@ -9,11 +9,12 @@
   "scripts": {
     "dev": "astro dev",
     "check": "astro check",
-    "build": "astro check && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "predev": "node scripts/copy-wasm.mjs",
     "prebuild": "node scripts/copy-wasm.mjs",
-    "test": "node --experimental-strip-types --import ./tests/loader.mjs --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --import ./tests/loader.mjs --test tests/*.test.ts",
+    "build:check": "astro check && astro build"
   },
   "dependencies": {
     "@astrojs/react": "^4.0.0",
