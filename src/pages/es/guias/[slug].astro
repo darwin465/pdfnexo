@@ -1,0 +1,11 @@
+---
+import GuidePage from '../../../components/guides/GuidePage.astro';
+import { getGuides, guideIds } from '../../../i18n';
+
+export function getStaticPaths() {
+  const guides = getGuides('es');
+  return guideIds.map((id) => ({ params: { slug: guides.guides[id]!.slug }, props: { id } }));
+}
+const { id } = Astro.props;
+---
+<GuidePage lang="es" guideId={id} />

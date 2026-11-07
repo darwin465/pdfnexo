@@ -1,0 +1,6 @@
+---
+import AdSlot from './AdSlot.astro';
+interface Props { slot: 'header' | 'content' | 'tool' | 'article'; label: string }
+const { slot, label } = Astro.props;
+---
+<AdSlot slot={slot} format="rectangle" label={label} />

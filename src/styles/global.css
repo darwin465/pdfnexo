@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-brand-50: #eef3ff;
+  --color-brand-100: #dbe6ff;
+  --color-brand-200: #bccffd;
+  --color-brand-500: #3b5bdb;
+  --color-brand-600: #2f49c7;
+  --color-brand-700: #243aa3;
+  --color-brand-800: #1c2e80;
+  --color-brand-900: #14215c;
+  --color-accent-50: #f5f3ff;
+  --color-accent-100: #ede9fe;
+  --color-accent-500: #8b5cf6;
+  --color-accent-600: #7c3aed;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px rgb(15 23 42 / 0.05);
+  --shadow-card-hover: 0 2px 4px rgb(15 23 42 / 0.05), 0 10px 28px rgb(36 58 163 / 0.12);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-slate-50 font-sans text-slate-900 antialiased; }
+  :focus-visible { outline: 2px solid var(--color-accent-600); outline-offset: 2px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* Anuncios: ocultos hasta que exista consentimiento; el espacio se reserva para evitar saltos (CLS). */
+[data-ad-wrap] { display: none; }
+html[data-ads='on'] [data-ad-wrap] { display: block; min-height: var(--ad-min, 100px); }

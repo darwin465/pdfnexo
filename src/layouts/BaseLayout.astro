@@ -1,0 +1,71 @@
+---
+import '../styles/global.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import AdBanner from '../components/ads/AdBanner.astro';
+import AdsRuntime from '../components/ads/AdsRuntime.astro';
+import ConsentBanner from '../components/legal/ConsentBanner';
+import { getDict, getLegal, legalPath, htmlLocale, languages, type Lang } from '../i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  /** Ruta equivalente de la página en cada idioma (empieza por "/"). */
+  alternates: Record<Lang, string>;
+  noindex?: boolean;
+}
+const { title, description, lang, alternates, noindex = false } = Astro.props;
+const t = getDict(lang);
+const legal = getLegal(lang);
+const adsEnabled = Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT);
+const base = Astro.site ?? Astro.url.origin;
+const abs = (path: string) => new URL(path, base).href;
+const canonical = abs(Astro.url.pathname);
+const otherLocales = languages.filter((l) => l !== lang);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {languages.map((code) => <link rel="alternate" hreflang={code} href={abs(alternates[code])} />)}
+    <link rel="alternate" hreflang="x-default" href={abs('/')} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#1c2e80" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={t.siteName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs('/og-image.png')} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={htmlLocale[lang]} />
+    {otherLocales.map((l) => <meta property="og:locale:alternate" content={htmlLocale[l]} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={abs('/og-image.png')} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <script is:inline>
+      try { if (localStorage.getItem('pdfnexo-consent') === 'granted') document.documentElement.setAttribute('data-ads', 'on'); } catch (e) {}
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow-card-hover">{t.nav.skip}</a>
+    <Header lang={lang} alternates={alternates} />
+    <AdBanner slot="header" label={legal.adLabel} />
+    <main id="main"><slot /></main>
+    <Footer lang={lang} alternates={alternates} />
+    <AdsRuntime />
+    {adsEnabled && (
+      <ConsentBanner client:idle title={legal.consent.title} text={legal.consent.text} accept={legal.consent.accept} reject={legal.consent.reject} more={legal.consent.more} moreHref={legalPath(lang, 'cookies')} />
+    )}
+  </body>
+</html>

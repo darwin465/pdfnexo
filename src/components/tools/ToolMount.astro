@@ -1,0 +1,28 @@
+---
+import type { ToolId } from '../../data/tools';
+import { getUi, type Lang } from '../../i18n';
+import MergeTool from './workspaces/MergeTool';
+import CompressTool from './workspaces/CompressTool';
+import SplitTool from './workspaces/SplitTool';
+import JpgToPdfTool from './workspaces/JpgToPdfTool';
+import PdfToJpgTool from './workspaces/PdfToJpgTool';
+import RotateTool from './workspaces/RotateTool';
+import ExtractTool from './workspaces/ExtractTool';
+import WatermarkTool from './workspaces/WatermarkTool';
+import OrganizeTool from './workspaces/OrganizeTool';
+import ProtectTool from './workspaces/ProtectTool';
+
+interface Props { lang: Lang; toolId: ToolId }
+const { lang, toolId } = Astro.props;
+const ui = getUi(lang);
+---
+{toolId === 'merge' && <MergeTool client:load lang={lang} ui={ui} />}
+{toolId === 'compress' && <CompressTool client:load lang={lang} ui={ui} />}
+{toolId === 'split' && <SplitTool client:load lang={lang} ui={ui} />}
+{toolId === 'jpg-to-pdf' && <JpgToPdfTool client:load lang={lang} ui={ui} />}
+{toolId === 'pdf-to-jpg' && <PdfToJpgTool client:load lang={lang} ui={ui} />}
+{toolId === 'rotate' && <RotateTool client:load lang={lang} ui={ui} />}
+{toolId === 'extract' && <ExtractTool client:load lang={lang} ui={ui} />}
+{toolId === 'watermark' && <WatermarkTool client:load lang={lang} ui={ui} />}
+{toolId === 'organize' && <OrganizeTool client:load lang={lang} ui={ui} />}
+{toolId === 'protect' && <ProtectTool client:load lang={lang} ui={ui} />}

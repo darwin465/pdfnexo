@@ -1,0 +1,35 @@
+---
+/**
+ * Hueco publicitario de AdSense. No renderiza nada si no hay identificadores configurados
+ * (PUBLIC_ADSENSE_CLIENT y el slot correspondiente). Nunca se muestra sin consentimiento.
+ */
+interface Props {
+  slot: 'header' | 'content' | 'tool' | 'article';
+  format: 'banner' | 'rectangle' | 'responsive';
+  label: string;
+}
+const { slot, format, label } = Astro.props;
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT as string | undefined;
+const slotIds = {
+  header: import.meta.env.PUBLIC_ADSENSE_SLOT_HEADER,
+  content: import.meta.env.PUBLIC_ADSENSE_SLOT_CONTENT,
+  tool: import.meta.env.PUBLIC_ADSENSE_SLOT_TOOL,
+  article: import.meta.env.PUBLIC_ADSENSE_SLOT_ARTICLE,
+} as Record<string, string | undefined>;
+const slotId = slotIds[slot];
+const enabled = Boolean(client && slotId);
+const minHeight = { banner: '90px', rectangle: '280px', responsive: '100px' }[format];
+---
+{enabled && (
+  <aside data-ad-wrap aria-label={label} style={`--ad-min:${minHeight}`} class="mx-auto my-10 w-full max-w-4xl px-4 sm:px-6">
+    <p class="mb-1 text-center text-[10px] uppercase tracking-wider text-slate-400">{label}</p>
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={client}
+      data-ad-slot={slotId}
+      data-ad-format={format === 'rectangle' ? 'rectangle' : 'auto'}
+      data-full-width-responsive={format === 'rectangle' ? 'false' : 'true'}
+    ></ins>
+  </aside>
+)}

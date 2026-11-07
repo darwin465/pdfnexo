@@ -1,0 +1,29 @@
+---
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT as string | undefined;
+---
+{client && (
+  <script is:inline define:vars={{ client }}>
+    (function () {
+      var KEY = 'pdfnexo-consent';
+      var granted = false;
+      try { granted = localStorage.getItem(KEY) === 'granted'; } catch (e) {}
+      function load() {
+        if (window.__pdfnexoAds) return;
+        window.__pdfnexoAds = true;
+        document.documentElement.setAttribute('data-ads', 'on');
+        var s = document.createElement('script');
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+        s.onload = function () {
+          document.querySelectorAll('ins.adsbygoogle').forEach(function () {
+            try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+          });
+        };
+        document.head.appendChild(s);
+      }
+      if (granted) load();
+      window.addEventListener('pdfnexo:consent', function (e) { if (e.detail && e.detail.ads) load(); });
+    })();
+  </script>
+)}

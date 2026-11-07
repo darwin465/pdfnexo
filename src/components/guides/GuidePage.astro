@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdResponsive from '../ads/AdResponsive.astro';
+import { getDict, getGuides, getLegal, guidePath, homePath, toolPath, type Lang } from '../../i18n';
+
+interface Props { lang: Lang; guideId: string }
+const { lang, guideId } = Astro.props;
+const t = getDict(lang);
+const g = getGuides(lang);
+const legal = getLegal(lang);
+const guide = g.guides[guideId]!;
+const alternates = { es: guidePath('es', guideId), en: guidePath('en', guideId) };
+const base = Astro.site ?? Astro.url.origin;
+const abs = (p: string) => new URL(p, base).href;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.title,
+    description: guide.description,
+    inLanguage: lang,
+    mainEntityOfPage: abs(guidePath(lang, guideId)),
+    publisher: { '@type': 'Organization', name: t.siteName },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t.toolPage.breadcrumbHome, item: abs(homePath(lang)) },
+      { '@type': 'ListItem', position: 2, name: guide.title, item: abs(guidePath(lang, guideId)) },
+    ],
+  },
+];
+---
+<BaseLayout title={`${guide.title} | PDFNexo`} description={guide.description} lang={lang} alternates={alternates}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <article class="mx-auto max-w-3xl px-4 pt-12 sm:px-6">
+    <nav aria-label="Breadcrumb" class="text-sm text-slate-500">
+      <a href={homePath(lang)} class="hover:text-brand-700">{t.toolPage.breadcrumbHome}</a> <span aria-hidden="true">/</span> <a href={`${homePath(lang)}#guides`} class="hover:text-brand-700">{g.breadcrumb}</a>
+    </nav>
+    <h1 class="mt-6 text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">{guide.title}</h1>
+    <p class="mt-4 text-lg leading-relaxed text-slate-600">{guide.intro}</p>
+    <div class="mt-10 space-y-8">
+      {guide.sections.map((section, i) => (
+        <>
+          <section>
+            <h2 class="text-xl font-semibold text-slate-900">{section.h}</h2>
+            {section.p.map((paragraph) => <p class="mt-3 leading-relaxed text-slate-700">{paragraph}</p>)}
+          </section>
+          {i === 1 && <AdResponsive slot="article" label={legal.adLabel} />}
+        </>
+      ))}
+    </div>
+    <a href={toolPath(lang, guide.tool)} class="mt-12 inline-flex rounded-xl bg-brand-700 px-6 py-3 font-semibold text-white shadow-card transition hover:bg-brand-800">
+      {g.tryTool}: {t.tools[guide.tool].name}
+    </a>
+  </article>
+</BaseLayout>

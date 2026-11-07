@@ -1,0 +1,18 @@
+---
+/** Botón de donación. No se renderiza nada si PUBLIC_DONATE_URL no está configurada. */
+import { getLegal, type Lang } from '../../i18n';
+interface Props { lang: Lang; withText?: boolean }
+const { lang, withText = false } = Astro.props;
+const url = (import.meta.env.PUBLIC_DONATE_URL as string | undefined)?.trim();
+const legal = getLegal(lang);
+const valid = url && /^https:\/\//.test(url);
+---
+{valid && (
+  <div>
+    {withText && <p class="mb-3 max-w-md text-sm leading-relaxed text-slate-600">{legal.donate.text}</p>}
+    <a href={url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:bg-accent-500">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.7 5 6 5c2 0 3.3 1 4 2.2h4C14.700 6 16 5 18 5c3.300 0 5.100 3.400 3.600 6.800C19.500 16.400 12 21 12 21z"/></svg>
+      {legal.donate.button}
+    </a>
+  </div>
+)}

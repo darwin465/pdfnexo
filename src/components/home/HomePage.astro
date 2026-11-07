@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolCard from '../tools/ToolCard';
+import ToolCatalog from '../tools/ToolCatalog';
+import Icon from '../common/Icon';
+import AdResponsive from '../ads/AdResponsive.astro';
+import DonateButton from '../common/DonateButton.astro';
+import { getDict, getGuides, getLegal, guideIds, guidePath, homePath, type Lang } from '../../i18n';
+import { getToolViews } from '../../lib/toolViews';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = getDict(lang);
+const alternates = { es: homePath('es'), en: homePath('en') };
+const popular = getToolViews(lang, (x) => x.popular);
+const all = getToolViews(lang);
+const guides = getGuides(lang);
+const legal = getLegal(lang);
+const base = Astro.site ?? Astro.url.origin;
+
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: t.siteName, url: new URL(homePath(lang), base).href, inLanguage: lang },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: t.faq.items.map((i) => ({ '@type': 'Question', name: i.q, acceptedAnswer: { '@type': 'Answer', text: i.a } })),
+  },
+];
+---
+<BaseLayout title={t.meta.homeTitle} description={t.meta.homeDescription} lang={lang} alternates={alternates}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <section class="relative overflow-hidden border-b border-slate-200 bg-white">
+    <div class="mx-auto max-w-6xl px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-20">
+      <div class="mx-auto max-w-3xl text-center">
+        <h1 class="text-4xl font-bold tracking-tight text-brand-900 sm:text-5xl">{t.hero.title}</h1>
+        <p class="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-600">{t.hero.subtitle}</p>
+        <a href="#tools" class="mt-8 inline-flex items-center gap-2 rounded-xl bg-brand-700 px-6 py-3 text-base font-semibold text-white shadow-card transition hover:bg-brand-800">
+          {t.hero.cta}
+          <Icon name="chevron" size={18} />
+        </a>
+      </div>
+
+      <h2 class="mb-5 mt-14 text-center text-sm font-semibold uppercase tracking-wider text-slate-500">{t.hero.popular}</h2>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {popular.map((tool) => <li><ToolCard tool={tool} /></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section id="tools" class="mx-auto max-w-6xl px-4 pt-16 sm:px-6">
+    <div class="mb-8 text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-brand-900">{t.catalog.title}</h2>
+      <p class="mt-3 text-slate-600">{t.catalog.subtitle}</p>
+    </div>
+    <ToolCatalog
+      client:visible
+      tools={all}
+      labels={{ label: t.search.label, placeholder: t.search.placeholder, none: t.search.none, count: t.search.count }}
+    />
+  </section>
+
+  <AdResponsive slot="content" label={legal.adLabel} />
+
+  <section class="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
+    <h2 class="mb-10 text-center text-3xl font-bold tracking-tight text-brand-900">{t.benefits.title}</h2>
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      {t.benefits.items.map((b) => (
+        <li class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-100 text-accent-600">
+            <Icon name={b.icon} size={20} strokeWidth={1.75} />
+          </span>
+          <h3 class="mt-4 font-semibold text-slate-900">{b.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600">{b.text}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="guides" class="mx-auto max-w-6xl px-4 pt-24 sm:px-6">
+    <div class="mb-8 text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-brand-900">{guides.sectionTitle}</h2>
+      <p class="mt-3 text-slate-600">{guides.sectionSubtitle}</p>
+    </div>
+    <ul class="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2">
+      {guideIds.map((id) => (
+        <li>
+          <a href={guidePath(lang, id)} class="group block h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover">
+            <h3 class="font-semibold text-slate-900">{guides.guides[id]!.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">{guides.guides[id]!.description}</p>
+            <span class="mt-4 inline-block text-sm font-semibold text-brand-700">{guides.read} →</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {import.meta.env.PUBLIC_DONATE_URL && (
+    <section class="mx-auto flex max-w-3xl flex-col items-center px-4 pt-20 text-center sm:px-6">
+      <DonateButton lang={lang} withText />
+    </section>
+  )}
+
+  <section id="faq" class="mx-auto max-w-3xl px-4 pt-24 sm:px-6">
+    <h2 class="mb-8 text-center text-3xl font-bold tracking-tight text-brand-900">{t.faq.title}</h2>
+    <div class="space-y-3">
+      {t.faq.items.map((item) => (
+        <details class="group rounded-xl border border-slate-200 bg-white p-5 shadow-card">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-slate-900 [&::-webkit-details-marker]:hidden">
+            {item.q}
+            <span class="text-xl leading-none text-slate-400 transition group-open:rotate-45" aria-hidden="true">+</span>
+          </summary>
+          <p class="mt-3 text-sm leading-relaxed text-slate-600">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
